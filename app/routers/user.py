@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models.user import User
 from app.utils.auth import verify_password, create_access_token, get_current_user
-from app.schemas.user import Token, UserCreate
+from app.schemas.user import Token, UserCreate, UserLogin
 from app.database import get_db
 from passlib.context import CryptContext
 
@@ -44,14 +44,16 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
 @router.post("/token", response_model=Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password)
+def login_for_access_token(user_login: UserLogin, db: Session = Depends(get_db)):
+    user = authenticate_user(db, user_login.username, user_login.senha)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Usuário ou senha incorretos",
-                            headers={"WWW-Authenticate": "Bearer"})
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email ou senha inválidos",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token-type": "bearer"}
 
 @router.get("/me")
 def read_users_me(current_user: User = Depends(get_current_user)):
