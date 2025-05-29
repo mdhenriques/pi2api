@@ -12,7 +12,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    senha = Column(String, nullable=False)
+    hashed_password = Column(String, nullable=False)
     xp = Column(Integer, default=0)
     coins = Column(Integer, default=0)
 
