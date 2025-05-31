@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from schemas.user import UserCreate
 from passlib.context import CryptContext
+from app.utils.auth import get_password_hash
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
