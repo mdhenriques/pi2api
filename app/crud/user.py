@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from app.models.user import User
 from schemas.user import UserCreate
 from passlib.context import CryptContext
@@ -19,3 +19,5 @@ def create_user(db: Session, user: UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+tasks = relationship("Task", back_populates="user")
