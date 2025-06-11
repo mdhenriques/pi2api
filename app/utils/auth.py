@@ -32,19 +32,22 @@ def create_access_token(data: dict):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-      token = credentials.credentials
-      try:
-          payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-          username: str = payload.get("sub")
-          if username is None:
-              raise HTTPException(
-                  status_code=status.HTTP_401_UNAUTHORIZED,
-                  detail="Credenciais inválidas"
-              )
-          return username
-      except JWTError:
-          raise HTTPException(
-              status_code=status.HTTP_401_UNAUTHORIZED,
-              detail="Token inválido"
-          )
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciais inválidas"
+            )
+        user = db.query(User).filter(User.id == int(user_id)).first()
+        if user is None:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        return user
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido"
+        )

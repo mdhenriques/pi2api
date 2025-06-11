@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 from app.database import Base
 
-class TaskStatus(PyEnum):
+class TaskStatus(str, PyEnum):
     PENDENTE = "pendente"
     ANDAMENTO = "andamento"
     CONCLUIDA = "concluida"
@@ -21,6 +21,6 @@ class Task(Base):
     prazo_entrega = Column(DateTime, nullable=True)
     tempo_estimado = Column(Float, nullable=True)  # Tempo em horas
     repetitiva = Column(Boolean, default=False)
-    status = Column(Enum(TaskStatus, native_enum=False), default=TaskStatus.PENDENTE)
+    status = Column(Enum(TaskStatus, name="taskstatus", native_enum=False), default=TaskStatus.PENDENTE)
 
     user = relationship("User", back_populates="tasks")
