@@ -23,4 +23,6 @@ class Task(Base):
     repetitiva = Column(Boolean, default=False)
     status = Column(Enum(TaskStatus, name="taskstatus", native_enum=False), default=TaskStatus.PENDENTE)
 
+    recompensa_moedas = Column(Integer, nullable=False, default=10)
+    recompensa_xp = Column(Integer, nullable=False, default= 20)
     user = relationship("User", back_populates="tasks")
