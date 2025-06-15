@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
 from app.models.user import User
+from app.models.association import UserItem
 from app.utils.auth import get_current_user
-from app.schemas.user import Token, UserCreate, UserLogin, UpdateUserRewards
+from app.schemas.user import UpdateUserRewards
+from app.schemas.user_item import UserItemCreate
 from app.crud import user as crud_user
 from app.database import get_db
-from passlib.context import CryptContext
+
 
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -33,4 +34,16 @@ def update_user_rewards(
             "xp": user.xp,
             "coins": user.coins
         }
+    }
+
+@router.post("/buy")
+def add_items_to_user(
+    user_item_data: UserItemCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    result = crud_user.create_user_item(db, current_user.id, user_item_data.item_id)
+    return {
+        "message": "Item adicionado com sucesso",
+        "user_items": result.item_ids
     }

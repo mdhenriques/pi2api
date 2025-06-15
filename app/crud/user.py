@@ -1,8 +1,11 @@
 from sqlalchemy.orm import Session, relationship
+from app.models.association import UserItem
 from app.models.user import User
+from app.models.item import Item
 from app.schemas.user import UserCreate, UpdateUserRewards
 from passlib.context import CryptContext
 from app.utils.auth import get_password_hash
+from fastapi import HTTPException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -38,3 +41,33 @@ def update_user_rewards(db: Session, user_id: int, rewards: UpdateUserRewards):
     return user
 
 tasks = relationship("Task", back_populates="user")
+
+
+def create_user_item(db: Session, user_id: int, item_id: int):
+    # Primeiro busca o registro de UserItem do usuário
+    user_items = db.query(UserItem).filter(UserItem.user_id == user_id).first()
+
+    # Se o usuário já tem um registro de items
+    if user_items:
+        # Caso o campo venha como None
+        if user_items.item_ids is None:
+            user_items.item_ids = []
+
+        # Se o item já estiver no array, bloqueia
+        if item_id in user_items.item_ids:
+            raise HTTPException(status_code=400, detail="Usuário já possui este item")
+
+        # Adiciona o novo item ao array
+        user_items.item_ids.append(item_id)
+
+    else:
+        # Se for o primeiro item do usuário, cria o registro
+        user_items = UserItem(user_id=user_id, item_ids=[item_id])
+        db.add(user_items)
+
+    db.commit()
+    db.refresh(user_items)
+
+    return user_items
+
+

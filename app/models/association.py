@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, ARRAY
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -6,11 +6,10 @@ class UserItem(Base):
     __tablename__ = "user_items"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    item_id = Column(Integer, ForeignKey("items.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    item_ids = Column(ARRAY(Integer), default=[])
 
     user = relationship("User", back_populates="items_comprados")
-    item = relationship("Item", back_populates="users_compraram")
 
 class UserMission(Base):
     __tablename__ = "user_missions"

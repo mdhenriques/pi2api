@@ -19,5 +19,3 @@ class Item(Base):
     preco_xp = Column(Integer, nullable=False)
     
 
-    # Relacionamentos
-    users_compraram = relationship('UserItem', back_populates='item')
