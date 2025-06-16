@@ -19,7 +19,7 @@ class UserMission(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     mission_id = Column(Integer, ForeignKey("missions.id"))
-    status = Column(String, default='pendente')
+    progresso = Column(Integer, default=0, nullable=False)
 
     user = relationship("User", back_populates="missions")
     mission = relationship("Mission", back_populates="users")
