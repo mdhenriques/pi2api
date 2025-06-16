@@ -58,7 +58,10 @@ def create_user_item(db: Session, user_id: int, item_id: int):
             raise HTTPException(status_code=400, detail="Usuário já possui este item")
 
         # Adiciona o novo item ao array
+        print(user_items.item_ids)
         user_items.item_ids.append(item_id)
+        print(user_items.item_ids)
+
 
     else:
         # Se for o primeiro item do usuário, cria o registro
@@ -69,5 +72,38 @@ def create_user_item(db: Session, user_id: int, item_id: int):
     db.refresh(user_items)
 
     return user_items
+
+def get_user_items(db: Session, user_id: int):
+    user_items = db.query(UserItem).filter(UserItem.user_id == user_id).first()
+    if user_items:
+        return user_items.item_ids
+    return []
+
+def update_avatar(db: Session, user_id: int, avatar_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return None
+    user.avatar_equipado_id = avatar_id
+    item = db.query(Item).filter(Item.id == user.avatar_equipado_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item não encontrado.")
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+def update_background(db: Session, user_id: int, background_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return None
+    user.background_equipado_id = background_id
+    item = db.query(Item).filter(Item.id == user.background_equipado_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item não encontrado.")
+
+    db.commit()
+    db.refresh(user)
+    return user
+
 
 
