@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, relationship
-from app.models.association import UserItem
+from app.models.association import UserItem, UserMission
+from app.models.mission import Mission
 from app.models.user import User
 from app.models.item import Item
 from app.schemas.user import UserCreate, UpdateUserRewards
@@ -12,16 +13,28 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def create_user(db: Session, user: UserCreate):
+def create_user_with_mission(db: Session, user_data: UserCreate):
     db_user = User(
-        username= user.username,
-        email=user.email,
-        password_hash=get_password_hash(user.password),
+        username=user_data.username,
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password)
     )
-    db.Add(db_user)
+    db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
+    # Cria a missão padrão para o usuário
+    mission_assignment = UserMission(
+        user_id=db_user.id,
+        mission_id=1,  # ID da missão de boas-vindas
+        progresso=0
+    )
+    db.add(mission_assignment)
+    db.commit()
+
     return db_user
+
+
 
 def update_user_rewards(db: Session, user_id: int, rewards: UpdateUserRewards):
     user = db.query(User).filter(User.id == user_id).first()

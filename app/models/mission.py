@@ -11,4 +11,4 @@ class Mission(Base):
         xp_recompensa = Column(Integer, nullable=False)
         coins_recompensa = Column(Integer, nullable=False)
         # Relacionamentos
-        users = relationship("UserMission", back_populates="mission")
+        users = relationship('UserMission', back_populates='mission', cascade="all, delete-orphan")
