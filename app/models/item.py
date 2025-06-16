@@ -10,7 +10,7 @@ class ItemType(PyEnum):
 class Item(Base):
     __tablename__ = "items"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nome = Column(String, nullable=False)
     descricao = Column(String, nullable=True)
     tipo = Column(Enum(ItemType), nullable=False)

@@ -16,3 +16,17 @@ class ItemSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+class ItemCreate(BaseModel):
+    nome: str
+    descricao: str | None
+    tipo: ItemType
+    url: str
+    preco_coins: int
+    preco_xp: int
+
+class ItemSchema(ItemCreate):
+    id: int
+
+    class Config:
+        orm_mode = True
