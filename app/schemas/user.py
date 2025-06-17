@@ -20,6 +20,15 @@ class UserLogin(BaseModel):
     username: str
     senha: str
 
+class UpdateUserRewards(BaseModel):
+    xp: Optional[int] = None
+    coins: Optional[int] = None
+
+class EquipAvatar(BaseModel):
+    avatar_equipado_id: int
+
+class EquipBackground(BaseModel):
+    background_equipado_id: int
 
 # Para retorno do token
 class Token(BaseModel):

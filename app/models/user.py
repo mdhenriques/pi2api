@@ -1,10 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
-from .association import UserItem, UserMission
-from .item import Item
-from .task import Task
-from .mission import Mission
 
 class User(Base):
     __tablename__ = "users"
@@ -24,4 +20,6 @@ class User(Base):
 
     items_comprados = relationship('UserItem', back_populates='user')
     tasks = relationship('Task', back_populates='user')
-    missions = relationship('UserMission', back_populates='user')
+    missions = relationship('Mission', back_populates='user')
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+
