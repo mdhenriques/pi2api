@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, relationship
-from app.models.association import UserItem, UserMission
+from app.models.association import UserItem
 from app.models.mission import Mission
 from app.models.user import User
 from app.models.item import Item
@@ -22,15 +22,6 @@ def create_user_with_mission(db: Session, user_data: UserCreate):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-
-    # Cria a missão padrão para o usuário
-    mission_assignment = UserMission(
-        user_id=db_user.id,
-        mission_id=1,  # ID da missão de boas-vindas
-        progresso=0
-    )
-    db.add(mission_assignment)
-    db.commit()
 
     return db_user
 

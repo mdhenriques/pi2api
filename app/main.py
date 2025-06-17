@@ -3,6 +3,7 @@ from app.routers import auth, task, user, item, mission
 from app.database import Base, engine
 from app import models
 
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()

@@ -1,41 +1,29 @@
 from sqlalchemy.orm import Session
-from app.models.mission import Mission
-from app.models.association import UserMission
-from app.schemas.mission import MissionCreate, MissionProressUpdate, UserMissionCreate, UserMissionResponse
+from typing import List, Optional
+from app.models.mission import Mission as MissionModel
+from app.schemas.mission import MissionCreate
 
-def atualizar_progresso(db: Session, mission_id: int):
-    mission = db.query(Mission).filter(Mission.id == mission_id).first()
+def get_missions(db: Session, user_id: int, skip: int = 0, limit: int = 100) -> List[MissionModel]:
+    return db.query(MissionModel).filter(MissionModel.user_id == user_id).offset(skip).limit(limit).all()
+
+def create_mission(db: Session, mission: MissionCreate, user_id: int):
+    db_mission = MissionModel(**mission.model_dump(), user_id=user_id)
+    db.add(db_mission)
+    db.commit()
+    db.refresh(db_mission)
+    return db_mission
+
+def increment_user_mission_progress(db: Session, user_id: int, mission_id = int):
+    mission = db.query(MissionModel).filter(
+        MissionModel.id == mission_id,
+        MissionModel.user_id == user_id
+    ).first()
 
     if not mission:
-        return None
+        raise ValueError(f"Missão id={mission_id} não pertence ao usuário")
     
-    if mission.progresso < 5:
-        mission.progresso += 1
-    else: mission.progresso = 0
+    mission.progresso = (mission.progresso + 1) % 6
 
     db.commit()
     db.refresh(mission)
     return mission
-
-def create_mission(db: Session, mission_data: MissionCreate):
-    mission = Mission(
-        titulo=mission_data.titulo,
-        descricao=mission_data.descricao,
-        xp_recompensa=mission_data.xp_recompensa,
-        coins_recompensa=mission_data.coins_recompensa
-    )
-    db.add(mission)
-    db.commit()
-    db.refresh(mission)
-    return mission
-
-def assign_mission_to_user(db: Session, user_id: int, user_mission_data: UserMissionCreate):
-    user_mission = UserMission(
-        user_id=user_id,
-        mission_id=user_mission_data.mission_id,
-        progresso=0
-    )
-    db.add(user_mission)
-    db.commit()
-    db.refresh(user_mission)
-    return user_mission
