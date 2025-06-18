@@ -5,6 +5,12 @@ from app.database import Base, engine
 from app.scheduler.notification_jobs import check_task_deadlines
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 Base.metadata.create_all(bind=engine)
 
