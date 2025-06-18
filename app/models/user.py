@@ -21,4 +21,5 @@ class User(Base):
     items_comprados = relationship('UserItem', back_populates='user')
     tasks = relationship('Task', back_populates='user')
     missions = relationship('Mission', back_populates='user')
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
 
